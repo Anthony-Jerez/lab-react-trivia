@@ -15,11 +15,21 @@ function App() {
   };
 
   const fetchNewQuestion = async () => {
-    const newQuestion = await fetch('https://opentdb.com/api.php?amount=1&category=9&type=multiple');
-    const newQuestionData = await newQuestion.json();
-    setSelectedAnswer(null);
-    setQuestionData(newQuestionData.results[0]);
-  }
+    try {
+      const response = await fetch('https://opentdb.com/api.php?amount=1&category=9&type=multiple');
+      if (!response.ok) {
+        throw new Error(`HTTP error. Status: ${response.status}`);
+      }
+      const newQuestionData = await response.json();
+      if (!newQuestionData.results || newQuestionData.results.length === 0) {
+        throw new Error('No questions found in API response.');
+      }
+      setSelectedAnswer(null);
+      setQuestionData(newQuestionData.results[0]);
+    } catch (error) {
+      console.error('Error fetching new question data: ', error.message);
+    }
+  };  
 
   let card;
 
